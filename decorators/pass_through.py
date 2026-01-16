@@ -5,6 +5,7 @@ from versions import wrapt
 P = ParamSpec("P")
 R = TypeVar("R")
 
+
 @wrapt.decorator
 def pass_through(
     wrapped: Callable[P, R],

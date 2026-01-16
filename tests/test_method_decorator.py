@@ -5,16 +5,17 @@ class Test:
     @pass_through
     def function_im(self, a: int, b: int) -> int:
         return a + b
-    
+
     @pass_through
     @classmethod
     def function_cm(cls, a: int, b: int) -> int:
         return a + b
-    
+
     @pass_through
     @staticmethod
     def function_sm(a: int, b: int) -> int:
         return a + b
+
 
 instance = Test()
 
