@@ -16,7 +16,11 @@ test-pyright:
 test-ty:
     uvx ty check tests
 
-test: test-mypy test-pyrefly test-pyright test-ty
+test:
+    -uv run mypy tests
+    -uv run pyrefly check tests
+    -uv run pyright tests
+    -uv run ty check tests
 
 clean:
     rm -rf .mypy_cache

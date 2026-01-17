@@ -70,3 +70,20 @@ def decorator(
     adapter: str | FullArgSpec | AdapterFactory | Callable[..., Any] | None = None,
     proxy: type[FunctionWrapper[Any, Any]] | None = None,
 ) -> PartialFunctionDecorator: ...
+
+# function_wrapper()
+
+@overload
+def function_wrapper(wrapper: type[Any]) -> V1_FunctionDecorator: ...
+@overload
+def function_wrapper(
+    wrapper: GenericCallableWrapperFunction[P, R],
+) -> V1_FunctionDecorator: ...
+@overload
+def function_wrapper(
+    wrapper: ClassMethodWrapperFunction[P, R],
+) -> V1_FunctionDecorator: ...
+@overload
+def function_wrapper(
+    wrapper: InstanceMethodWrapperFunction[P, R],
+) -> V1_FunctionDecorator: ...
