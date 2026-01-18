@@ -34,7 +34,7 @@ class _FunctionWrapperBase(ObjectProxy[WrappedFunction[P, R]]):
     _self_parent: Any
     _self_owner: Any
 
-class V2_BoundFunctionWrapper(_FunctionWrapperBase[P1, R1]):
+class BoundFunctionWrapper(_FunctionWrapperBase[P1, R1]):
     def __call__(self, *args: P1.args, **kwargs: P1.kwargs) -> R1: ...
 
     # Note that for following overloads, testing with mypy and ty they still do
@@ -48,26 +48,26 @@ class V2_BoundFunctionWrapper(_FunctionWrapperBase[P1, R1]):
 
     @overload
     def __get__(  # Required to ensure mypy, pyrefly and ty works correctly
-        self: V2_BoundFunctionWrapper[Concatenate[T2, P2], R2],
+        self: BoundFunctionWrapper[Concatenate[T2, P2], R2],
         instance: T2,
         owner: type[T2] | None = None,
-    ) -> V2_BoundFunctionWrapper[P2, R2]: ...
+    ) -> BoundFunctionWrapper[P2, R2]: ...
     @overload
     def __get__(  # Required to ensure mypy, pyrefly and ty works correctly
-        self: V2_BoundFunctionWrapper[Concatenate[T2, P2], R2],
+        self: BoundFunctionWrapper[Concatenate[T2, P2], R2],
         instance: T,
         owner: type[Any] | None = None,
-    ) -> V2_BoundFunctionWrapper[P2, R2]: ...
+    ) -> BoundFunctionWrapper[P2, R2]: ...
     @overload
     def __get__(  # Required to ensure mypy, pyrefly and ty works correctly
         self, instance: None, owner: type[T1] | None = None
-    ) -> V2_BoundFunctionWrapper[P1, R1]: ...
+    ) -> BoundFunctionWrapper[P1, R1]: ...
     @overload
     def __get__(  # Required to ensure pyright works correctly
         self, instance: T1, owner: type[T1] | None = None
-    ) -> V2_BoundFunctionWrapper[P1, R1]: ...
+    ) -> BoundFunctionWrapper[P1, R1]: ...
 
-class V2_FunctionWrapper(_FunctionWrapperBase[P1, R1]):
+class FunctionWrapper(_FunctionWrapperBase[P1, R1]):
     def __init__(
         self,
         wrapped: WrappedFunction[P1, R1],
@@ -87,68 +87,66 @@ class V2_FunctionWrapper(_FunctionWrapperBase[P1, R1]):
 
     @overload
     def __get__(  # Required to ensure mypy, pyrefly and ty works correctly
-        self: V2_FunctionWrapper[Concatenate[T2, P2], R2],
+        self: FunctionWrapper[Concatenate[T2, P2], R2],
         instance: T2,
         owner: type[Any] | None = None,
-    ) -> V2_BoundFunctionWrapper[P2, R2]: ...
+    ) -> BoundFunctionWrapper[P2, R2]: ...
     @overload
     def __get__(  # Required to ensure mypy, pyrefly and ty works correctly
-        self: V2_FunctionWrapper[Concatenate[T2, P2], R2],
+        self: FunctionWrapper[Concatenate[T2, P2], R2],
         instance: T2,
         owner: type[T2] | None = None,
-    ) -> V2_BoundFunctionWrapper[P2, R2]: ...
+    ) -> BoundFunctionWrapper[P2, R2]: ...
     @overload
     def __get__(  # Required to ensure mypy, pyrefly and ty works correctly
         self, instance: None, owner: type[T1] | None = None
-    ) -> V2_BoundFunctionWrapper[P1, R1]: ...
+    ) -> BoundFunctionWrapper[P1, R1]: ...
     @overload
     def __get__(  # Required to ensure pyright works correctly
         self, instance: T1, owner: type[T1] | None = None
-    ) -> V2_BoundFunctionWrapper[P1, R1]: ...
+    ) -> BoundFunctionWrapper[P1, R1]: ...
 
-class V2_FunctionDecorator:
+class FunctionDecorator:
     @overload
     def __call__(
         self,
         callable: (
             Callable[P, R]
-            | Callable[Concatenate[type[T], P], R]
+            | Callable[Concatenate[type[T], P], R]  # Required for pylance
             # | Callable[Concatenate[Any, P], R]  # Breaks mypy, pyrefly and ty
-            | Callable[[type[T]], R]
+            | Callable[[type[T]], R]  # Required for pylance
         ),
-    ) -> V2_FunctionWrapper[P, R]: ...
+    ) -> FunctionWrapper[P, R]: ...
     @overload
-    def __call__(self, callable: Descriptor) -> V2_FunctionWrapper[P, Any]: ...
+    def __call__(self, callable: Descriptor) -> FunctionWrapper[P, Any]: ...
 
-class V2_PartialFunctionDecorator:
+class PartialFunctionDecorator:
     @overload
     def __call__(
         self, wrapper: GenericCallableWrapperFunction[P, R], /
-    ) -> V2_FunctionDecorator: ...
+    ) -> FunctionDecorator: ...
     @overload
     def __call__(
         self, wrapper: ClassMethodWrapperFunction[P, R], /
-    ) -> V2_FunctionDecorator: ...
+    ) -> FunctionDecorator: ...
     @overload
     def __call__(
         self, wrapper: InstanceMethodWrapperFunction[P, R], /
-    ) -> V2_FunctionDecorator: ...
+    ) -> FunctionDecorator: ...
 
 @overload
-def decorator(wrapper: type[T], /) -> V2_FunctionDecorator: ...
+def decorator(wrapper: type[T], /) -> FunctionDecorator: ...
 
 # ... Decorator applied to function or method.
 
 @overload
 def decorator(
     wrapper: GenericCallableWrapperFunction[P, R], /
-) -> V2_FunctionDecorator: ...
+) -> FunctionDecorator: ...
 @overload
-def decorator(wrapper: ClassMethodWrapperFunction[P, R], /) -> V2_FunctionDecorator: ...
+def decorator(wrapper: ClassMethodWrapperFunction[P, R], /) -> FunctionDecorator: ...
 @overload
-def decorator(
-    wrapper: InstanceMethodWrapperFunction[P, R], /
-) -> V2_FunctionDecorator: ...
+def decorator(wrapper: InstanceMethodWrapperFunction[P, R], /) -> FunctionDecorator: ...
 
 # ... Positional arguments.
 
@@ -157,22 +155,22 @@ def decorator(
     *,
     enabled: bool | Boolean | Callable[[], bool] | None = None,
     adapter: str | FullArgSpec | AdapterFactory | Callable[..., Any] | None = None,
-    proxy: type[V2_FunctionWrapper[Any, Any]] | None = None,
-) -> V2_PartialFunctionDecorator: ...
+    proxy: type[FunctionWrapper[Any, Any]] | None = None,
+) -> PartialFunctionDecorator: ...
 
 # function_wrapper()
 
 @overload
-def function_wrapper(wrapper: type[Any]) -> V2_FunctionDecorator: ...
+def function_wrapper(wrapper: type[Any]) -> FunctionDecorator: ...
 @overload
 def function_wrapper(
     wrapper: GenericCallableWrapperFunction[P, R],
-) -> V2_FunctionDecorator: ...
+) -> FunctionDecorator: ...
 @overload
 def function_wrapper(
     wrapper: ClassMethodWrapperFunction[P, R],
-) -> V2_FunctionDecorator: ...
+) -> FunctionDecorator: ...
 @overload
 def function_wrapper(
     wrapper: InstanceMethodWrapperFunction[P, R],
-) -> V2_FunctionDecorator: ...
+) -> FunctionDecorator: ...

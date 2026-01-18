@@ -7,7 +7,7 @@ R = TypeVar("R")
 
 
 @wrapt.decorator
-def pass_through(
+def pass_through_decorator(
     wrapped: Callable[P, R],
     instance: Any,
     args: tuple[Any, ...],

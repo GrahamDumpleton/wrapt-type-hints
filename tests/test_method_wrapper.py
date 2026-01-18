@@ -1,17 +1,17 @@
-from decorators.pass_through_decorator import pass_through_decorator
+from decorators.pass_through_wrapper import pass_through_wrapper
 
 
 class Test:
-    @pass_through_decorator
+    @pass_through_wrapper
     def function_im(self, a: int, b: int) -> int:
         return a + b
 
-    @pass_through_decorator
+    @pass_through_wrapper
     @classmethod
     def function_cm(cls, a: int, b: int) -> int:
         return a + b
 
-    @pass_through_decorator
+    @pass_through_wrapper
     @staticmethod
     def function_sm(a: int, b: int) -> int:
         return a + b
