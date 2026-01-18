@@ -55,7 +55,7 @@ class BoundFunctionWrapper(_FunctionWrapperBase[P1, R1]):
     @overload
     def __get__(  # Required to ensure mypy, pyrefly and ty works correctly
         self: BoundFunctionWrapper[Concatenate[T2, P2], R2],
-        instance: T,
+        instance: T2,
         owner: type[Any] | None = None,
     ) -> BoundFunctionWrapper[P2, R2]: ...
     @overload
